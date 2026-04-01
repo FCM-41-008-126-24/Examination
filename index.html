@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Modern Villa VR | Final Build</title>
+        <!--<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>-->
+        <script src="js/aframe.min.js"></script>
+        <!--<script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+        -->
+
+        <script>
+            // The custom logic to handle the proximity opening
+            AFRAME.registerComponent("auto-opener", {
+                init: function () {
+                    this.opened = false;
+                },
+                tick: function () {
+                    const player = document.querySelector("#player-camera");
+                    if (!player) return;
+
+                    const playerPos = player.object3D.getWorldPosition(new THREE.Vector3());
+                    const doorPos = this.el.object3D.getWorldPosition(new THREE.Vector3());
+                    const distance = playerPos.distanceTo(doorPos);
+
+                    if (distance < 3.5 && !this.opened) {
+                        this.el.emit("open-door");
+                        this.opened = true;
+                    } else if (distance > 4.5 && this.opened) {
+                        this.el.emit("close-door");
+                        this.opened = false;
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <a-scene shadow="type: pcfsoft">
+            <!--Asset code-->
+            <a-assets>
+                <img id="floor-wood" src="assets/textures/WoodFloor051_1K-JPG_Color.jpg" />
+                <img id="wall-plaster" src="assets/textures/Plaster001_1K-JPG_Color.jpg" />
+                <a-asset-item id="double-door" src="assets/models/Door_Double.glb"></a-asset-item>
+                <a-asset-item id="window-frame" src="assets/models/Windows.glb"></a-asset-item>
+                <a-asset-item id="single-door" src="assets/models/Door.glb"></a-asset-item>
+                <img id="roof-color" src="assets/textures/roofing_color.jpg" />
+                <img id="roof-normal" src="assets/textures/roofing_normal.jpg" />
+                <a-asset-item id="bed" src="assets/models/Bed.glb"></a-asset-item>
+                <a-asset-item id="desk" src="assets/models/Adjustable_Desk.glb"></a-asset-item>
+                <a-asset-item id="shelf" src="assets/models/Cabinet_with_shelf.glb"></a-asset-item>
+                <a-asset-item id="plant" src="assets/models/Houseplant.glb"></a-asset-item>
+                <a-asset-item id="lantern-model" src="assets/models/Lantern.glb"></a-asset-item>
+                <!--<a-asset-item id="chandelier-model" src="assets/models/Light_in_Chandelier.glb"></a-asset-item>-->
+                <a-asset-item id="office-chair" src="assets/models/Office_Chair%20(1).glb"></a-asset-item>
+                <!--<a-asset-item id="sofa-bed" src="assets/models/Sofa_bed.glb"></a-asset-item>-->
+                <a-asset-item id="closet" src="assets/models/Closet.glb"></a-asset-item>
+                <a-asset-item id="computer-model" src="assets/models/Computer.glb"></a-asset-item>
+                <a-asset-item id="chandelier-bulb" src="assets/models/Light_in_Chandelier.glb"></a-asset-item>
+                <a-asset-item id="kitchen-unit" src="assets/models/Kitchen_Cooktop_and_Counter.glb"></a-asset-item>
+                <a-asset-item id="fridge-model" src="assets/models/Refrigerator.glb"></a-asset-item>
+                <a-asset-item id="oven-model" src="assets/models/Oven.glb"></a-asset-item>
+                <a-asset-item id="kitchen-table" src="assets/models/Modern_Kitchen_Table.glb"></a-asset-item>
+                <a-asset-item id="floor-lantern" src="assets/models/Lantern.glb"></a-asset-item>
+                <a-asset-item id="light-cube" src="assets/models/Light_Cube.glb"></a-asset-item>
+                <a-asset-item id="tv-model" src="assets/models/Tv.glb"></a-asset-item>
+                <a-asset-item id="tv-cabinet" src="assets/models/Cabinet_Television.glb"></a-asset-item>
+                <a-asset-item id="sofa-bed" src="assets/models/Sofa_bed.glb"></a-asset-item>
+                <!--<a-asset-item id="wide-couch" src="assets/models/Couch_%7C_Wide.glb"></a-asset-item>-->
+
+                <a-asset-item id="home-couch" src="assets/models/Couch_second.glb"></a-asset-item>
+
+                <a-asset-item id="couch-second" src="models/Couch_second.glb"></a-asset-item>
+                <a-asset-item id="coffee-table" src="assets/models/Coffee_Table.glb"></a-asset-item>
+                <a-asset-item id="ac" src="assets/models/Air_conditioner.glb"></a-asset-item>
+                <a-asset-item id="acint" src="assets/models/Air_intconditioner.glb"></a-asset-item>
+
+                <img id="skyTexture" src="assets/Images/sky.jpg" />
+                <img id="grassTexture" src="assets/textures/Grass_Color.jpg" />
+
+                <img id="poolTiles" src="assets/textures/pool.jpg" />
+                <img id="poolNormal" src="assets/textures/pool-nor.jpg" />
+
+                <img id="tile-color" src="assets/textures/tile_ground_color.jpg" />
+                <img id="tile-norm" src="assets/textures/tile_ground_normal.jpg" />
+
+                <img id="grass-color" src="assets/textures/Grass_Color.jpg" />
+
+                <img id="estate-color" src="assets/textures/ground-color.jpg" />
+                <img id="estate-norm" src="assets/textures/ground-normal.jpg" />
+                <a-asset-item id="slim-tree" src="assets/models/slimwall-tree.glb"></a-asset-item>
+                <a-asset-item id="motorcycle-model" src="assets/models/Motorcycle.glb"></a-asset-item>
+                <a-asset-item id="pine-tree" src="assets/models/Pine.glb"></a-asset-item>
+            </a-assets>
+
+            <a-sky src="#skyTexture"></a-sky>
+            <!--floor-->
+            <!--
+            <a-plane
+                src="#grassTexture"
+                rotation="-90 0 0"
+                width="300"
+                height="300"
+                repeat="150 150"
+                position="0 -0.2 0"
+                material="roughness: 1; metalness: 0;">
+            </a-plane> -->
+
+            <!--sand floor-->
+            <a-plane
+                id="outer-perimeter"
+                material="src: #estate-color; normalMap: #estate-norm; repeat: 200 200; roughness: 1"
+                rotation="-90 0 0"
+                width="800"
+                height="800"
+                position="0 -0.3 0">
+            </a-plane>
+
+            <!--Grass floor-->
+            <a-plane
+                id="grass-perimeter"
+                material="src: #grass-color; repeat: 30 30; roughness: 1"
+                rotation="-90 0 0"
+                width="70"
+                height="70"
+                position="0 -0.25 0">
+            </a-plane>
+
+            <!--tiled floor-->
+            <a-plane
+                id="tile-perimeter"
+                material="src: #tile-color; normalMap: #tile-norm; repeat: 12 12"
+                rotation="-90 0 0"
+                width="45"
+                height="40"
+                position="0 -0.2 0"
+                shadow="receive: true">
+            </a-plane>
+
+            <!--<a-scene fog="type: exponential; color: #a3c1ad; density: 0.01">-->
+            <a-entity id="connector" position="0 0 -4">
+                <!--back door floor-->
+                <a-plane
+                    rotation="-90 0 0"
+                    width="4"
+                    height="8"
+                    position="0 0 -2"
+                    material="src: #floor-wood"></a-plane>
+
+                <!--back door runway ceiling-->
+                <a-plane
+                    rotation="90 0 0"
+                    width="29"
+                    height="8.0"
+                    position="0 4 -2"
+                    material="color: #FFFFFF; roughness: 1"></a-plane>
+
+                <!--backdoor-left wall-->
+                <a-box position="-2.05 2 -0.3" width="0.1" height="4" depth="7.5" material="src: #wall-plaster"></a-box>
+
+                <!--backdoor -right wall-->
+                <a-box position="2.05 2 -1" width="0.3" height="4" depth="6" material="src: #wall-plaster"></a-box>
+
+                <!--main door lengthing-->
+                <a-box position="0 3.9 2" width="4" height="0.2" depth="0.1" material="src: #wall-plaster"></a-box>
+
+                <!--front wall door slide into-->
+                <a-box position="-5 2 2.15" width="5.9" height="4" depth="0.05" material="src: #wall-plaster">
+                    <a-entity gltf-model="#window-frame" position="0 0 0" rotation="0 0 0"></a-entity>
+                </a-box>
+
+                <!--Main front door-->
+                <a-entity
+                    id="door-slider"
+                    position="0 0 2"
+                    auto-opener
+                    animation__open="property: position; to: -3.8 0 2; dur: 1500; startEvents: open-door; easing: easeInOutQuad"
+                    animation__close="property: position; to: 0 0 2; dur: 1500; startEvents: close-door; easing: easeInOutQuad">
+                    <a-entity gltf-model="#double-door" scale="1.14 0.9 1" shadow="cast: true"></a-entity>
+                </a-entity>
+
+                <a-text
+                    value="WELCOME HOME"
+                    position="0 3.5 2.1"
+                    align="center"
+                    color="#D4AF37"
+                    width="6"
+                    font="exo2bold"></a-text>
+
+                <!--left sidebar door or walkway-->
+                <a-entity
+                    id="internal-door-wing-b"
+                    position="-2.1 0 -4 "
+                    auto-opener
+                    animation__open="property: position; to: -2 0 -1; dur: 1000; startEvents: open-door; easing: easeOutQuad"
+                    animation__close="property: position; to: -2.1  0 -4; dur: 1000; startEvents: close-door; easing: easeInQuad">
+                    <a-entity gltf-model="#single-door" rotation="0 90 0" scale="-1.15 0.95 -1"> </a-entity>
+                </a-entity>
+
+                <!--walk way back cover-->
+                <a-entity
+                    gltf-model="#window-frame"
+                    position="-0.1 1.9 -5.85"
+                    rotation="0 -180 0"
+                    scale="1.89 1.5 1"></a-entity>
+
+                <!--roof-->
+                <a-box
+                    id="connector-roof"
+                    position="0 4.2 -2"
+                    width="4.4"
+                    height="0.2"
+                    depth="10"
+                    material="src: #roof-color; normalMap: #roof-normal; normalTextureRepeat: 2 2; repeat: 2 2"
+                    shadow="receive: true">
+                </a-box>
+            </a-entity>
+
+            <a-entity id="wing-a" position="-8  0 -4">
+                <!--Ceiling-->
+                <a-plane rotation="90 0 0" width="12" height="8" position="0 4 0" material="color: #FFFFFF"></a-plane>
+                <a-plane
+                    rotation="-90 0 0"
+                    width="12"
+                    height="10"
+                    material="src: #floor-wood; repeat: 4 4"
+                    position=" 0 0 -1"></a-plane>
+
+                <!--back-wall-->
+                <a-box position="0 2 -6" width="12" height="4" depth="0.1" material="src: #wall-plaster"></a-box>
+
+                <!--left side wall for bed room-->
+                <a-box position="-6 2 -1" width="0.1" height="4" depth="9.9" material="src: #wall-plaster"></a-box>
+
+                <!--right sidewall for bed room back cover-->
+                <a-box position="0 2 -3" width="0.2" height="4" depth="6" material="src: #wall-plaster"></a-box>
+
+                <!--left sidewall for bed room front cover-->
+                <a-box position="0 2 3" width="0.2" height="4" depth="2" material="src: #wall-plaster"></a-box>
+
+                <!--right sidewall opening lengthing-->
+                <a-box position="0 3.5 1" width="0.2" height="0" depth="2" material="src: #wall-plaster"></a-box>
+
+                <!--Window frame 1-->
+                <a-entity gltf-model="#window-frame" position="-6.15 2.15 1.2" rotation="0 -90 0"></a-entity>
+
+                <!--window frame 2-->
+                <a-entity gltf-model="#window-frame" position="-6 2.15 -3" rotation="0 -90 0"></a-entity>
+                <a-entity gltf-model="#window-frame" position="-5.9 2.15 -3" rotation="0 -90 0"></a-entity>
+
+                <a-box position="0 3.5 1" width="0.2" height="1" depth="2" material="src: #wall-plaster"></a-box>
+
+                <a-entity gltf-model="#window-frame" position="-6 2 0" rotation="0 90 0"></a-entity>
+
+                <!--door to wing a -->
+                <a-entity
+                    id="internal-door-left"
+                    position="0 0 2"
+                    auto-opener
+                    animation__open="property: position; to: 0.5 0 -0.3; dur: 1000; startEvents: open-door; easing: easeOutQuad"
+                    animation__close="property: position; to: 0 0 2; dur: 1000; startEvents: close-door; easing: easeInQuad">
+                    <a-entity gltf-model="#single-door" rotation="0 90 0" scale="-1.14 0.7 1"> </a-entity>
+                </a-entity>
+
+                <!--ROOF-->
+                <a-box
+                    id="wing-a-roof"
+                    position="0 4.2 -1.1"
+                    width="13.5"
+                    height="0.3"
+                    depth="11.7"
+                    material="src: #roof-color; normalMap: #roof-normal; normalTextureRepeat: 6 4; repeat: 6 4"
+                    shadow="receive: true">
+                </a-box>
+
+                <!--interior-->
+                <!--Bed-->
+                <a-entity
+                    gltf-model="#bed"
+                    position="-1.6 0 -2.7"
+                    rotation="0 -90 0"
+                    scale="1.5 1.5 1.5"
+                    shadow="cast: true">
+                </a-entity>
+
+                <!--desk-->
+                <a-entity gltf-model="#desk" position="-5.2 0 0.3" rotation="0 0 0" scale="1 1 1"> </a-entity>
+
+                <!--plant-->
+                <a-entity gltf-model="#plant" position="-5.2 0 -5.5" scale="0.8 0.8 0.8"> </a-entity>
+
+                <!--chair-->
+                <a-entity gltf-model="#office-chair" position="-3.9 0 0.2" rotation="0 -90 0" scale="1.2 1.2 1.2">
+                </a-entity>
+                <!--closet-->
+                <a-entity
+                    gltf-model="#closet"
+                    position="-2.4 0.2 -5.4"
+                    rotation="0 0 0"
+                    scale="1.1 1.1 1.1"
+                    shadow="cast: true">
+                </a-entity>
+
+                <!--Computer-->
+                <a-entity
+                    gltf-model="#computer-model"
+                    position="-5.2 0.95 0.6"
+                    rotation="0 90 0"
+                    scale="0.003 0.003 0.003">
+                </a-entity>
+
+                <!--chanderlier light-->
+                <a-entity gltf-model="#light-cube" scale="0.9 0.9 0.9" position="-3 4 0"> </a-entity>
+                <a-entity
+                    light="type: point; intensity: 6; distance: 10; color: #FFF2D8; castShadow: true"
+                    position="-3 2.2 0">
+                </a-entity>
+
+                <!--kitchen-->
+                <a-entity gltf-model="#kitchen-unit" position="2.1 0.97 -5.1" rotation="0 180 0" scale="1 1 1">
+                </a-entity>
+
+                <!--fridge-->
+                <a-entity gltf-model="#fridge-model" position="1 1 -3" rotation="0 0 0" scale="2 2 2"> </a-entity>
+
+                <!--oven-->
+                <a-entity gltf-model="#oven-model" position="5.3 0 1" rotation="0 -90 0" scale="1.1 1.1 1.1">
+                </a-entity>
+
+                <!--kitchen table-->
+                <a-entity gltf-model="#kitchen-table" position="2.5 1 -1.9" rotation="0 0 0" scale="1 1 1"> </a-entity>
+
+                <!--kitchen lamp1-->
+                <a-entity
+                    id="ambient-lantern"
+                    gltf-model="#floor-lantern"
+                    position="2 3.5 -5.6"
+                    rotation="0 90 0"
+                    scale="1.5 1.5 1.5">
+                    <a-light
+                        type="point"
+                        color="#ff9d00"
+                        intensity=""
+                        distance="3"
+                        animation="property: intensity; from: 0.3; to: 0.5; dir: alternate; dur: 500; loop: true">
+                    </a-light>
+                </a-entity>
+
+                <!--kitchen lamp2-->
+                <a-entity
+                    id="ambient-lantern"
+                    gltf-model="#floor-lantern"
+                    position="3 3.5 1.8"
+                    rotation="0 90 0"
+                    scale="1.5 1.5 1.5">
+                    <a-light
+                        type="point"
+                        color="#ff9d00"
+                        intensity=""
+                        distance="3"
+                        animation="property: intensity; from: 0.3; to: 0.5; dir: alternate; dur: 500; loop: true">
+                    </a-light>
+                </a-entity>
+
+                <!--front cover plaster-->
+                <a-entity
+                    gltf-model="#window-frame"
+                    position="-3.2  2 3.96"
+                    rotation="0 -180 0"
+                    scale="2.8 1.5 1"></a-entity>
+                <!--outside  garage lamp-->
+                <a-entity
+                    id="modern-cube"
+                    gltf-model="#light-cube"
+                    position="2.9 3.8 4.6"
+                    rotation="0 -45 0"
+                    scale="0.5 0.5 0.5">
+                </a-entity>
+                <a-light
+                    type="point"
+                    color="#00e5ff"
+                    intensity="4"
+                    distance="15"
+                    decay="2"
+                    position="2.9 2.5 4.6"
+                    castShadow="true">
+                </a-light>
+
+                <!--ouside main door light-->
+                <a-entity
+                    id="modern-cube"
+                    gltf-model="#light-cube"
+                    position="8 4 2.5"
+                    rotation="0 -45 0"
+                    scale="0.5 0.5 0.5">
+                </a-entity>
+                <a-light
+                    type="point"
+                    color="#00e5ff"
+                    intensity="6"
+                    distance="15"
+                    decay="2"
+                    position="7.9 3.8 5"
+                    castShadow="true">
+                </a-light>
+
+                <!--infront of bedroom light-->
+                <a-entity
+                    id="modern-cube"
+                    gltf-model="#light-cube"
+                    position="-3 4 4.5"
+                    rotation="0 -45 0"
+                    scale="0.5 0.5 0.5">
+                </a-entity>
+                <a-light
+                    type="point"
+                    color="#00e5ff"
+                    intensity="11"
+                    distance="15"
+                    decay="2"
+                    position="-3 4 6.6"
+                    castShadow="true">
+                </a-light>
+
+                <!--walkway buld-->
+                <a-entity
+                    id="modern-cube"
+                    gltf-model="#light-cube"
+                    position="8 4 -2"
+                    rotation="0 -45 0"
+                    scale="0.5 0.5 0.5">
+                </a-entity>
+                <a-light
+                    type="point"
+                    color="orange"
+                    intensity="3"
+                    distance="15"
+                    decay="2"
+                    position="8 2.6 -2"
+                    castShadow="true">
+                </a-light>
+            </a-entity>
+
+            <!--motocycle-->
+            <a-entity
+                gltf-model="#motorcycle-model"
+                scale="0.04 0.04 0.04"
+                position="-5 0 -1"
+                rotation="0 90 0"
+                shadow="cast: true">
+            </a-entity>
+
+            <!--aircondition ext-->
+            <a-entity gltf-model="#ac" position="-14.3 1.5 -9" scale="0.005 0.005 0.005" rotation=" 0 180 0"></a-entity>
+
+            <!--acint-->
+            <a-entity
+                gltf-model="#acint"
+                position="-8.47 3.1 -6"
+                scale="0.0025 0.0035 0.005"
+                rotation="0 -90 0"></a-entity>
+
+            <a-entity id="wing-b" position="8 0 -6">
+                <!--wing b floor-->
+                <a-plane rotation="-90 0 0" width="12" height="8" material="src: #floor-wood; repeat: 4 4"> </a-plane>
+
+                <!--b-wing back wall-->
+                <a-box position="0 2 -4.05" width="12" height="4" depth="0.1" material="src: #wall-plaster">
+                    <a-entity gltf-model="#window-frame" position="0 0 -0.1" rotation="0 0 0"></a-entity>
+                    <a-entity gltf-model="#window-frame" position="0 0 0" rotation="0 0 0"></a-entity>
+                </a-box>
+
+                <!--wing -b right wall-->
+                <a-box position="6.05 2 0" width="0.1" height="4" depth="8" material="src: #wall-plaster">
+                    <a-entity gltf-model="#window-frame" position="0 0 0" rotation="0 90 0"></a-entity>
+                </a-box>
+                <!--wing b door way -->
+                <a-entity
+                    id="internal-door-wing-b"
+                    position="-5.8 0 -1.79 "
+                    auto-opener
+                    animation__open="property: position; to: -6.4 0 1; dur: 1000; startEvents: open-door; easing: easeOutQuad"
+                    animation__close="property: position; to: -5.85  0 -1.79; dur: 1000; startEvents: close-door; easing: easeInQuad">
+                    <a-entity gltf-model="#single-door" rotation="0 90 0" scale="-1.25 1 1"> </a-entity>
+                </a-entity>
+
+                <!--roof-->
+                <a-box
+                    id="wing-b-roof"
+                    position="0 4.2 -0.415"
+                    width="12.5"
+                    height="0"
+                    depth="9.1"
+                    material="src: #roof-color; normalMap: #roof-normal; normalTextureRepeat: 6 4; repeat: 6 4"
+                    shadow="receive: true">
+                </a-box>
+                <!--front b-wing cover wall-->
+                <a-box
+                    position="0.2 2 3.9"
+                    width="0.1"
+                    height="4"
+                    depth="12"
+                    material="src: #wall-plaster"
+                    rotation="0 -90 0">
+                    <a-entity gltf-model="#window-frame" position="0 0 2" rotation="0 90 0"></a-entity>
+                </a-box>
+
+                <a-text
+                    value="LUX"
+                    position="3 2 4"
+                    rotation="0 0 0"
+                    align="center"
+                    color="rgba(212, 175, 55, 0.52)"
+                    width="45"
+                    font=""></a-text>
+
+                <!--interior-->
+                <!--b wing buld-->
+                <a-entity
+                    id="modern-cube"
+                    gltf-model="#light-cube"
+                    position="0.5 3.8 0"
+                    rotation="0 -45 0"
+                    scale="0.8 0.8 0.8">
+                </a-entity>
+                <!--absolute bulb-->
+                <a-light
+                    type="point"
+                    color="#00e5ff"
+                    intensity="9"
+                    distance="15"
+                    decay="2"
+                    position="0.3 1.7 -1"
+                    castShadow="true">
+                </a-light>
+                <!--TV-->
+                <a-entity gltf-model="#tv-model" position="6 2 0" rotation="0 90 0" scale="2 2 1"> </a-entity>
+            </a-entity>
+            <!--sofa bed chair old-->
+            <a-entity gltf-model="#sofa-bed" position="10 0 -7.9" rotation="0 0 0" scale="1 1.1 1"> </a-entity>
+            <!--5.5 0 -6.6-->
+            <!--TV cabinet-->
+            <a-entity gltf-model="#tv-cabinet" position="13.4 0 -8." rotation="0 90 0" scale="5 2 2"> </a-entity>
+
+            <!--couch new-->
+            <a-entity gltf-model="#home-couch" position="5.5 0 -6.6" scale="2.5 2 2" rotation="0 90 0"> </a-entity>
+            <!--10 0 -9-->
+
+            <!--plant-->
+            <a-entity gltf-model="#plant" position="2.5 0 -9.5" scale="1 1 1" shadow="cast: true"> </a-entity>
+
+            <!--coffee table-->
+            <a-entity gltf-model="#coffee-table" position="8.6 0.3 -5.9" scale="1 1 1" rotation="0 90 0"></a-entity>
+
+            <!--aircondition ext-->
+            <a-entity gltf-model="#ac" position="14.3 1.5 -9" scale="0.005 0.005 0.005"></a-entity>
+
+            <!--acint-->
+            <a-entity gltf-model="#acint" position="5 3.1 -9.6" scale="0.003 0.0035 0.005" rotation="0 0 0"></a-entity>
+
+            <!--pool-->
+            <a-entity id="swimming-pool" position="8 -0.2 3">
+                <!--pool-edge-->
+                <a-box width="12" height="0.2" depth="8" color="rgb(230, 220, 201)"></a-box>
+
+                <!--pool tiles and color-->
+                <a-plane
+                    src="#poolTiles"
+                    normal-map="#poolNormal"
+                    repeat="6 4"
+                    position="0 0.05 0"
+                    rotation="-90 0 0"
+                    width="10"
+                    height="6">
+                </a-plane>
+
+                <a-plane
+                    position="0 0.12 0"
+                    rotation="-90 0 0"
+                    width="10"
+                    height="6"
+                    color="#0077be"
+                    opacity="0.5"
+                    animation="property: position; to: 0 0.19 0; dur: 2500; dir: alternate; loop: true; easing: easeInOutSine">
+                </a-plane>
+            </a-entity>
+
+            <!--Slim trees-->
+            <!--left-winga trees-->
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-32 0 21"
+                scale="1 1 1"
+                animation="property: rotation; from: 0 0 0; to: 3 10 -3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-32 0 10"
+                scale="1.6 1.6 1.6"
+                animation="property: rotation; from: 0 0 0; to: 3 10 -3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-32 0 -1"
+                scale="1.6 1.6 1.6"
+                animation="property: rotation; from: 0 0 0; to: 3 10 -3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-32 0 -13"
+                scale="1.6 1.6 1.6"
+                animation="property: rotation; from: 0 0 0; to: 3 10 -3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-32 0 -30"
+                scale="1.6 1.6 1.6"
+                animation="property: rotation; from: 0 0 0; to: 3 10 -3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <!--right wing b trees-->
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="34 0 -4"
+                scale="2 2 2 "
+                animation="property: rotation; from: 0 0 0; to: 2 0 -2; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="34 0 -15"
+                scale="1.5 1.5 1.5"
+                animation="property: rotation; from: 0 0 0; to: 2 0 -2; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="34 0 -31"
+                scale="2 2 2 "
+                animation="property: rotation; from: 0 0 0; to: 2 0 -2; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="34 0 25"
+                scale="0.6 0.6 0.6"
+                animation="property: rotation; from: 0 0 0; to: 2 0 -2; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+            <a-entity
+                gltf-model="#slim-tree"
+                position="34 0 10"
+                scale="2 1.5 2"
+                animation="property: rotation; from: 0 0 0; to: 2 0 -2; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <!--backhouse trees-->
+            <a-entity
+                gltf-model="#slim-tree"
+                position="14 0 -32"
+                scale="3 3 3"
+                animation="property: rotation; from: 0 0 0; to: -1 0 3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-20 0 -32"
+                scale="2 2 2"
+                animation="property: rotation; from: 0 0 0; to: -1 0 3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <a-entity
+                gltf-model="#slim-tree"
+                position="-3 0 -32"
+                scale="3 3 3"
+                animation="property: rotation; from: 0 0 0; to: -1 0 3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"></a-entity>
+
+            <!--front trees-->
+            <a-entity id="pine-grove">
+                <a-entity
+                    gltf-model="#pine-tree"
+                    position="-28 0 33"
+                    scale="1 1 1"
+                    animation="property: rotation; from: 0 0 -1; to: 1 0 1; dur: 5000; dir: alternate; loop: true; easing: easeInOutQuad">
+                </a-entity>
+
+                <a-entity
+                    gltf-model="#pine-tree"
+                    position="28 0 33"
+                    scale="1 1 1"
+                    animation="property: rotation; from: -1 0 0; to: 1 0 0; dur: 5000; dir: alternate; loop: true; easing: easeInOutQuad">
+                </a-entity>
+            </a-entity>
+            camera staff
+            <a-entity id="rig" position="0 0 8">
+                <a-entity
+                    id="player-camera"
+                    camera
+                    look-controls
+                    wasd-controls="acceleration: 65"
+                    position="0 1.6 0"></a-entity>
+            </a-entity>
+
+            <a-entity light="type: ambient; intensity: 0.6; color: #BBB"></a-entity>
+            <a-entity light="type: directional; intensity: 0.8; castShadow: true" position="-1 10 5"></a-entity>
+        </a-scene>
+    </body>
+</html>
